@@ -1,0 +1,151 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 100
+
+struct Student {
+    int roll;
+    char name[50];
+    float marks;
+};
+
+struct Student students[MAX];
+int n = 0;
+
+void insertStudent();
+void displayStudents();
+void deleteStudent();
+void updateStudent();
+int linearSearch(int roll);
+void bubbleSortByMarks();
+void filterByMarks();
+
+int main() {
+    int choice;
+    while (1) {
+        printf("\n===== Student Record Management =====\n");
+        printf("1. Insert Student\n");
+        printf("2. Delete Student\n");
+        printf("3. Update Student\n");
+        printf("4. Display All Students\n");
+        printf("5. Search Student (Linear)\n");
+        printf("6. Sort by Marks (Bubble)\n");
+        printf("7. Filter by Marks\n");
+        printf("0. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: insertStudent(); break;
+            case 2: deleteStudent(); break;
+            case 3: updateStudent(); break;
+            case 4: displayStudents(); break;
+            case 5: {
+                int roll;
+                printf("Enter Roll No to search: ");
+                scanf("%d", &roll);
+                int idx = linearSearch(roll);
+                if (idx != -1)
+                    printf("Found: Roll=%d, Name=%s, Marks=%.2f\n", 
+                           students[idx].roll, students[idx].name, students[idx].marks);
+                else
+                    printf("Student not found!\n");
+                break;
+            }
+            case 6: bubbleSortByMarks(); displayStudents(); break;
+            case 7: filterByMarks(); break;
+            case 0: return 0;
+            default: printf("Invalid choice!\n");
+        }
+    }
+}
+
+void insertStudent() {
+    if (n == MAX) {
+        printf("Student list full!\n");
+        return;
+    }
+    printf("Enter Roll No: "); scanf("%d", &students[n].roll);
+    printf("Enter Name: "); scanf("%s", students[n].name);
+    printf("Enter Marks: "); scanf("%f", &students[n].marks);
+    n++;
+}
+
+void displayStudents() {
+    if (n == 0) {
+        printf("No records found.\n");
+        return;
+    }
+    printf("\nRoll\tName\tMarks\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%s\t%.2f\n", students[i].roll, students[i].name, students[i].marks);
+    }
+}
+
+void deleteStudent() {
+    int roll, idx = -1;
+    printf("Enter Roll No to delete: ");
+    scanf("%d", &roll);
+    for (int i = 0; i < n; i++) {
+        if (students[i].roll == roll) {
+            idx = i;
+            break;
+        }
+    }
+    if (idx == -1) {
+        printf("Student not found!\n");
+        return;
+    }
+    for (int i = idx; i < n - 1; i++) {
+        students[i] = students[i + 1];
+    }
+    n--;
+    printf("Record deleted successfully.\n");
+}
+
+void updateStudent() {
+    int roll, idx = -1;
+    printf("Enter Roll No to update: ");
+    scanf("%d", &roll);
+    idx = linearSearch(roll);
+    if (idx == -1) {
+        printf("Student not found!\n");
+        return;
+    }
+    printf("Enter new Name: "); scanf("%s", students[idx].name);
+    printf("Enter new Marks: "); scanf("%f", &students[idx].marks);
+    printf("Record updated successfully.\n");
+}
+
+int linearSearch(int roll) {
+    for (int i = 0; i < n; i++) {
+        if (students[i].roll == roll)
+            return i;
+    }
+    return -1;
+}
+
+void bubbleSortByMarks() {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (students[j].marks < students[j + 1].marks) {
+                struct Student temp = students[j];
+                students[j] = students[j + 1];
+                students[j + 1] = temp;
+            }
+        }
+    }
+    printf("Sorted by marks (descending).\n");
+}
+
+void filterByMarks() {
+    float threshold;
+    printf("Enter minimum marks: ");
+    scanf("%f", &threshold);
+    printf("Students scoring above %.2f:\n", threshold);
+    for (int i = 0; i < n; i++) {
+        if (students[i].marks >= threshold) {
+            printf("%d\t%s\t%.2f\n", students[i].roll, students[i].name, students[i].marks);
+        }
+    }
+}
